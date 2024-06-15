@@ -1,4 +1,8 @@
-import Image from "next/image";
+"use client"
+
+import { Brain } from "lucide-react";
+import { useRouter } from 'next/navigation';
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -7,46 +11,52 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 
 export default function Home() {
+  const router = useRouter();
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-center">
+          <CardTitle className="text-center mb-5">
             Welcome to the Two-Back Application
           </CardTitle>
-          <CardDescription className="text-center">
-            A gamified version of a classical experimental psychology task which
-            measures working memory.
-          </CardDescription>
+          <div className="text-center mb-5">
+            <CardDescription>
+              A gamified version of a classical experimental psychology task
+              which measures working memory.
+            </CardDescription>
+          </div>
+          <div className="flex justify-center">
+            <Brain height={60} width={60} />
+          </div>
+          <div className="text-center mt-5">
+            <CardDescription>
+              <CardDescription className="text-center">
+                <div className="mt-5 text-black dark:text-white">
+                    You'll see a sequence of stimuli, with letters displayed
+                    every 3000 milliseconds. Your task is to determine if the
+                    current letter matches the one shown two steps earlier. The
+                    game ends either when the sequence is complete or after 3
+                    incorrect answers
+                </div>
+              </CardDescription>
+            </CardDescription>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="text-center mb-4">
-            <p>
-              To begin the game please enter your name below and press the start
-              button
-            </p>
+          <div className="text-center mt-10 mb-4">
+            <span>Please enter your name below & press start button</span>
           </div>
           <div className="flex justify-center mb-4">
             <Input className="w-1/2" placeholder="Enter your name" />
-          </div>
-          <div className="flex justify-center">
-            <Button>Start</Button>
+            <Button onClick={() => router.push('/game/')}  className="flex justify-center ml-4">
+              Start
+            </Button>
           </div>
         </CardContent>
-        {/* <CardFooter>
-          <p>Card Footer</p>
-        </CardFooter> */}
       </Card>
     </main>
   );
