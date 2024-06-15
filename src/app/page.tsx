@@ -12,12 +12,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-
 export default function Home() {
   const router = useRouter();
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
+    <main className="flex min-h-screen flex-col items-center justify-center p-6 md:p-24">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-center mb-5">
@@ -40,7 +39,7 @@ export default function Home() {
                     every 3000 milliseconds. Your task is to determine if the
                     current letter matches the one shown two steps earlier. The
                     game ends either when the sequence is complete or after 3
-                    incorrect answers
+                    incorrect answers.
                 </div>
               </CardDescription>
             </CardDescription>
@@ -50,9 +49,9 @@ export default function Home() {
           <div className="text-center mt-10 mb-4">
             <span>Please enter your name below & press start button</span>
           </div>
-          <div className="flex justify-center mb-4">
-            <Input className="w-1/2" placeholder="Enter your name" />
-            <Button onClick={() => router.push('/game/')}  className="flex justify-center ml-4">
+          <div className="flex flex-col items-center md:flex-row md:justify-center mb-4">
+            <Input className="w-full md:w-1/2" placeholder="Enter your name" />
+            <Button onClick={() => router.push('/game/')} className="mt-4 md:mt-0 md:ml-4">
               Start
             </Button>
           </div>
