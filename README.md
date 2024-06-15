@@ -53,7 +53,6 @@ I selected Next.js for its built-in routing capabilities and utilized a global R
 
 ✔ **Task Completion Conditions**: End task after either three errors or displaying 15 letters.
 
-✔ **Event Logging**: Capture user interactions as events, mimicking backend interaction.
 
 ✔ **Fully Responsive & Mobile Compatibility**: Ensure UI is responsive and mobile-friendly.
 
@@ -63,9 +62,8 @@ I selected Next.js for its built-in routing capabilities and utilized a global R
 
 ✔ **Hosting App / Deployment**: Deploy the solution online for easy reviewing.
 
-✔ **Error Handling & Form Validation**: Implement error handling and validation for graceful edge case handling.
+✔ **Light & Dark Mode options**: Implement light and dark mode to give users options
 
-✔ **Unit & Integration Testing**: Include unit or integration tests if time allows.
 
 <br/>
 
@@ -75,11 +73,9 @@ I selected Next.js for its built-in routing capabilities and utilized a global R
 
 ---
 
-💥 Implement a feature to track missed correct answers by the user.
+💥 Refactor the code (Game into different components).
 
-💥 Introduce brief blank intervals and/or card animations between each stimulus.
-
-💥 Enhance UX by integrating a timer display or countdown feature for each presented stimulus.
+💥 Change stimuli from numbers to images.
 
 <br/>
 
