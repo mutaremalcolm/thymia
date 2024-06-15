@@ -36,7 +36,7 @@ export default function Home() {
             <CardDescription>
               <CardDescription className="text-center">
                 <div className="mt-5 text-black dark:text-white">
-                    You'll see a sequence of stimuli, with letters displayed
+                    You&apos;ll see a sequence of stimuli, with letters displayed
                     every 3000 milliseconds. Your task is to determine if the
                     current letter matches the one shown two steps earlier. The
                     game ends either when the sequence is complete or after 3
