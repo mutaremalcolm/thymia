@@ -1,9 +1,13 @@
 "use client"
 
+import * as z from "zod";
+import toast from "react-hot-toast";
 import { Brain } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form, SubmitHandler, useForm } from "react-hook-form";
 import {
   Card,
   CardContent,
@@ -12,8 +16,39 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+const NameSchema = z.object({
+  name: z
+  .string()
+  .trim()
+  .min(1, { message: "Name is required to proceed" })
+  .min(3, { message: "Name is too short" })
+  .max(15, { message: "Username is too long" })
+});
+type NameSchemaType = z.infer<typeof NameSchema>;
+
 export default function Home() {
   const router = useRouter();
+
+  const {
+    handleSubmit,
+    formState: { errors },
+  } = useForm<NameSchemaType>({
+    resolver: zodResolver(NameSchema),
+    mode: "onSubmit",
+    reValidateMode: "onChange",
+    shouldFocusError: true,
+    // delayError: 400,
+  });
+
+  const onSubmit: SubmitHandler<NameSchemaType> = async (data) => {
+    try {
+      // user.setUsername(data.username);
+      router.push("./game");
+      
+    } catch (err: any) {
+      toast.error("Something went wrong. Please try again later.");
+    }
+  };
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-6 md:p-24">
@@ -46,6 +81,7 @@ export default function Home() {
           </div>
         </CardHeader>
         <CardContent>
+          <form onSubmit={handleSubmit(onSubmit)}>
           <div className="text-center mt-10 mb-4">
             <span>Please enter your name below & press start button</span>
           </div>
@@ -55,6 +91,14 @@ export default function Home() {
               Start
             </Button>
           </div>
+          <div className="flex h-4 md:w-full md:pl-2">
+            {errors.name && (
+              <span className="relative text-red-500 text-sm font-semibold sm:text-left -translate-y-1.5">
+                {errors.name.message}
+              </span>
+            )}
+          </div>
+          </form>
         </CardContent>
       </Card>
     </main>
