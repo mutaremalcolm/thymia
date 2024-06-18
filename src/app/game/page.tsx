@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -10,14 +10,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Header from "@/components/Header";
+import { useUserContext } from "../../contexts/UserContext";
 
 const Game = () => {
+  const { correctAnswers, setCorrectAnswers, wrongAnswers, setWrongAnswers, restartGame } = useUserContext();
   const [chancesLeft, setChancesLeft] = useState(3); 
   const [questionsRemaining, setQuestionsRemaining] = useState(15); 
   const [currentLetter, setCurrentLetter] = useState<string>(""); 
   const [letters, setLetters] = useState<string[]>([]); 
-  const [errors, setErrors] = useState(0); 
-  const [correctGuesses, setCorrectGuesses] = useState(0); 
   const [gameOver, setGameOver] = useState(false); 
 
   useEffect(() => {
@@ -41,21 +41,19 @@ const Game = () => {
   const handleSeenIt = () => {
     const letter2Back = letters[letters.length - 3]; 
     if (letter2Back === currentLetter) {
-      setCorrectGuesses((prev) => prev + 1);
+      setCorrectAnswers((prev) => prev + 1);
     } else {
-      setErrors((prev) => prev + 1);
+      setWrongAnswers((prev) => prev + 1);
       setChancesLeft((prev) => prev - 1);
     }
 
-    if (errors + 1 >= 3) {
-      // Check if errors reach 3
+    if (wrongAnswers + 1 >= 3) {
       endGame();
     }
   };
 
   const progressGame = () => {
-    if (errors >= 3 || questionsRemaining <= 1) {
-      // End the game if 3 errors are made or if all questions are answered
+    if (wrongAnswers >= 3 || questionsRemaining <= 1) {
       endGame();
       return;
     }
@@ -66,14 +64,13 @@ const Game = () => {
 
   const endGame = () => {
     setGameOver(true);
-    alert(`Game Over! Errors: ${errors}, Correct Guesses: ${correctGuesses}`);
+    alert(`Game Over! Errors: ${wrongAnswers}, Correct Guesses: ${correctAnswers}`);
   };
 
   const handleRestart = () => {
     setChancesLeft(3);
     setQuestionsRemaining(15);
-    setErrors(0);
-    setCorrectGuesses(0);
+    restartGame();
     setLetters([]);
     setCurrentLetter("");
     setGameOver(false);
