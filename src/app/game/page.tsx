@@ -1,7 +1,8 @@
-"use client"
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import toast from "react-hot-toast";
 import {
   Card,
   CardContent,
@@ -10,73 +11,80 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Header from "@/components/Header";
+import { useUserContext } from "../../contexts/UserContext";
 
 const Game = () => {
-  const [chancesLeft, setChancesLeft] = useState(3); 
-  const [questionsRemaining, setQuestionsRemaining] = useState(15); 
-  const [currentLetter, setCurrentLetter] = useState<string>(""); 
-  const [letters, setLetters] = useState<string[]>([]); 
-  const [errors, setErrors] = useState(0); 
-  const [correctGuesses, setCorrectGuesses] = useState(0); 
-  const [gameOver, setGameOver] = useState(false); 
+  const { correctAnswers, setCorrectAnswers, wrongAnswers, setWrongAnswers, restartGame } = useUserContext();
+  const [chancesLeft, setChancesLeft] = useState(3);
+  const [questionsRemaining, setQuestionsRemaining] = useState(15);
+  const [currentLetter, setCurrentLetter] = useState<string>("");
+  const [letters, setLetters] = useState<string[]>([]);
+  const [gameOver, setGameOver] = useState(false);
+
+  const allowedLetters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]; 
 
   useEffect(() => {
     if (!gameOver) {
-      generateNewLetter(); 
+      generateNewLetter();
 
       const interval = setInterval(() => {
         progressGame();
       }, 3000);
 
-      return () => clearInterval(interval); 
+      return () => clearInterval(interval);
     }
   }, [gameOver]);
 
   const generateNewLetter = () => {
-    const letter = String.fromCharCode(65 + Math.floor(Math.random() * 26)); 
+    const letter = allowedLetters[Math.floor(Math.random() * allowedLetters.length)];
     setLetters((prevLetters) => [...prevLetters, letter]);
     setCurrentLetter(letter);
+    if (questionsRemaining <= 0){
+      endGame();
+    }
   };
 
   const handleSeenIt = () => {
-    const letter2Back = letters[letters.length - 3]; 
+    const letter2Back = letters[letters.length - 3];
     if (letter2Back === currentLetter) {
-      setCorrectGuesses((prev) => prev + 1);
+      toast('Correct Answer');
+      setCorrectAnswers(prev => prev + 1);
     } else {
-      setErrors((prev) => prev + 1);
-      setChancesLeft((prev) => prev - 1);
+      setWrongAnswers(prev => prev + 1);
+      setChancesLeft(prev => prev - 1);
     }
 
-    if (errors + 1 >= 3) {
-      // Check if errors reach 3
+    if (wrongAnswers + 1 >= 3) {
       endGame();
     }
   };
 
   const progressGame = () => {
-    if (errors >= 3 || questionsRemaining <= 1) {
-      // End the game if 3 errors are made or if all questions are answered
+    if (wrongAnswers >= 3 || questionsRemaining <= 0) {
       endGame();
       return;
     }
 
-    setQuestionsRemaining((prev) => prev - 1);
-    generateNewLetter();
+    setQuestionsRemaining(prev => prev - 1);
+    if (questionsRemaining > 0) {
+      generateNewLetter();
+    }
   };
 
   const endGame = () => {
     setGameOver(true);
-    alert(`Game Over! Errors: ${errors}, Correct Guesses: ${correctGuesses}`);
+    toast(`Game Over! Errors: ${wrongAnswers}, Correct Guesses: ${correctAnswers}`);
   };
 
   const handleRestart = () => {
     setChancesLeft(3);
     setQuestionsRemaining(15);
-    setErrors(0);
-    setCorrectGuesses(0);
+    setWrongAnswers(0);
+    setCorrectAnswers(0);
     setLetters([]);
     setCurrentLetter("");
     setGameOver(false);
+    restartGame();
   };
 
   return (
