@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "react-hot-toast";
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { UserContextProvider } from "@/contexts/UserContext";
@@ -21,6 +22,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <UserContextProvider>
+          <Toaster
+          position="bottom-center"
+          reverseOrder={false}
+          />
           <ThemeProvider
             attribute="class"
             defaultTheme="light"
@@ -30,6 +35,7 @@ export default function RootLayout({
             <Navbar />
             {children}
           </ThemeProvider>
+          
         </UserContextProvider>
       </body>
     </html>
