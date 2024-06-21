@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -14,49 +15,51 @@ import Header from "@/components/Header";
 import { useUserContext } from "../../contexts/UserContext";
 
 const Game = () => {
-  const { correctAnswers, setCorrectAnswers, wrongAnswers, setWrongAnswers, restartGame } = useUserContext();
+  const {
+    correctAnswers,
+    setCorrectAnswers,
+    wrongAnswers,
+    setWrongAnswers,
+    restartGame,
+    gameOver,
+    setGameOver,
+    logout,
+  } = useUserContext();
   const [chancesLeft, setChancesLeft] = useState(3);
   const [questionsRemaining, setQuestionsRemaining] = useState(15);
   const [currentLetter, setCurrentLetter] = useState<string>("");
   const [letters, setLetters] = useState<string[]>([]);
-  const [gameOver, setGameOver] = useState(false);
+  const router = useRouter();
 
-  const allowedLetters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]; 
+  const allowedLetters = ["A", "B", "C", "D", "E", "F"];
 
   useEffect(() => {
     if (!gameOver) {
       generateNewLetter();
 
-      const interval = setInterval(() => {
-        progressGame();
-      }, 3000);
-
+      const interval = setInterval(generateNewLetter, 2000);
       return () => clearInterval(interval);
     }
-  }, [gameOver]);
+  }, [gameOver, questionsRemaining]);
 
   const generateNewLetter = () => {
     const letter = allowedLetters[Math.floor(Math.random() * allowedLetters.length)];
     setLetters((prevLetters) => [...prevLetters, letter]);
-    setCurrentLetter(letter);
-    if (questionsRemaining <= 0){
-      endGame();
-    }
+    setCurrentLetter(letter); 
+    // progressGame()
   };
 
   const handleSeenIt = () => {
     const letter2Back = letters[letters.length - 3];
     if (letter2Back === currentLetter) {
-      toast('Correct Answer');
-      setCorrectAnswers(prev => prev + 1);
+      toast("Correct Answer");
+      setCorrectAnswers((prev) => prev + 1);
     } else {
-      setWrongAnswers(prev => prev + 1);
-      setChancesLeft(prev => prev - 1);
+      toast("InCorrect Answer");
+      setWrongAnswers((prev) => prev + 1);
+      setChancesLeft((prev) => prev - 1);
     }
 
-    if (wrongAnswers + 1 >= 3) {
-      endGame();
-    }
   };
 
   const progressGame = () => {
@@ -65,16 +68,16 @@ const Game = () => {
       return;
     }
 
-    setQuestionsRemaining(prev => prev - 1);
+    setQuestionsRemaining((prev) => prev - 1); 
     if (questionsRemaining === 0) {
-       endGame();
+      endGame();
     }
   };
 
   const endGame = () => {
     setGameOver(true);
-    toast(`Game Over! Errors: ${wrongAnswers}, Correct Guesses: ${correctAnswers}`);
   };
+
 
   const handleRestart = () => {
     setChancesLeft(3);
@@ -100,20 +103,19 @@ const Game = () => {
           </div>
           <div className="text-center mt-5">
             <CardDescription>
-              <CardDescription className="text-center">
-                <div className="mt-5 text-9xl text-black dark:text-white">{currentLetter}</div>
-              </CardDescription>
+              <div className="mt-5 text-9xl text-black dark:text-white">{currentLetter}</div>
             </CardDescription>
           </div>
         </CardHeader>
         <CardContent></CardContent>
       </Card>
-      <div className="mt-5">
+      <div className="flex flex-row mt-5">
         {gameOver ? (
           <Button onClick={handleRestart}>Start</Button>
         ) : (
           <Button onClick={handleSeenIt}>Seen It</Button>
         )}
+        <Button className='ml-5' onClick={logout}>Logout</Button>
       </div>
       <div className="flex items-center mt-10 mb-4">
         <span>
