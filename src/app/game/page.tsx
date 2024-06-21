@@ -66,8 +66,8 @@ const Game = () => {
     }
 
     setQuestionsRemaining(prev => prev - 1);
-    if (questionsRemaining > 0) {
-      generateNewLetter();
+    if (questionsRemaining === 0) {
+       endGame();
     }
   };
 
