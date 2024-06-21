@@ -15,21 +15,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useUserContext } from "@/contexts/UserContext";
+import { useUserContext } from "../contexts/UserContext";
 
 const NameSchema = z.object({
   name: z
-  .string()
-  .trim()
-  .min(1, { message: "Name is required to proceed" })
-  .min(3, { message: "Name is too short" })
-  .max(15, { message: "Username is too long" })
+    .string()
+    .trim()
+    .min(1, { message: "Name is required to proceed" })
+    .min(3, { message: "Name is too short" })
+    .max(15, { message: "Username is too long" })
 });
 type NameSchemaType = z.infer<typeof NameSchema>;
 
 export default function Home() {
-  const router = useRouter();
   const { setUserName } = useUserContext();
+  const router = useRouter();
 
   const {
     register,
@@ -73,11 +73,11 @@ export default function Home() {
             <CardDescription>
               <CardDescription className="text-center">
                 <section className="mt-5 text-black dark:text-white">
-                    You&apos;ll see a sequence of stimuli, with letters displayed
-                    every 3000 milliseconds. Your task is to determine if the
-                    current letter matches the one shown two steps earlier. The
-                    game ends either when the sequence is complete or after 3
-                    incorrect answers.
+                  You&apos;ll see a sequence of stimuli, with letters displayed
+                  every 3000 milliseconds. Your task is to determine if the
+                  current letter matches the one shown two steps earlier. The
+                  game ends either when the sequence is complete or after 3
+                  incorrect answers.
                 </section>
               </CardDescription>
             </CardDescription>
