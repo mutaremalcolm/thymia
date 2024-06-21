@@ -15,6 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useUserContext } from "@/contexts/UserContext";
 
 const NameSchema = z.object({
   name: z
@@ -28,8 +29,10 @@ type NameSchemaType = z.infer<typeof NameSchema>;
 
 export default function Home() {
   const router = useRouter();
+  const { setUserName } = useUserContext();
 
   const {
+    register,
     handleSubmit,
     formState: { errors },
     clearErrors,
@@ -43,9 +46,8 @@ export default function Home() {
 
   const onSubmit: SubmitHandler<NameSchemaType> = async (data) => {
     try {
-      // user.setUsername(data.username);
+      setUserName(data.name);
       router.push("./game");
-      
     } catch (err: any) {
       toast.error("Something went wrong. Please try again later.");
     }
@@ -83,25 +85,27 @@ export default function Home() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
-          <section className="text-center mt-10 mb-4">
-            <span>Please enter your name below & press start button</span>
-          </section>
-          <section className="flex flex-col items-center md:flex-row md:justify-center mb-4">
-            <Input className="w-full md:w-1/2" 
-            placeholder="Enter your name" 
-            onKeyDown={() => clearErrors()}
-            />
-            <Button className="mt-4 md:mt-0 md:ml-4">
-              Start
-            </Button>
-          </section>
-          <section className="flex h-4 md:w-full md:pl-2">
-            {errors.name && (
-              <span className="flex items-center relative text-red-500 text-sm font-semibold sm:text-left -translate-y-1.5">
-                {errors.name.message}
-              </span>
-            )}
-          </section>
+            <section className="text-center mt-10 mb-4">
+              <span>Please enter your name below & press start button</span>
+            </section>
+            <section className="flex flex-col items-center md:flex-row md:justify-center mb-4">
+              <Input 
+                className="w-full md:w-1/2" 
+                placeholder="Enter your name" 
+                {...register("name")}
+                onKeyDown={() => clearErrors()}
+              />
+              <Button className="mt-4 md:mt-0 md:ml-4" type="submit">
+                Start
+              </Button>
+            </section>
+            <section className="flex h-4 md:w-full md:pl-2">
+              {errors.name && (
+                <span className="flex items-center relative text-red-500 text-sm font-semibold sm:text-left -translate-y-1.5">
+                  {errors.name.message}
+                </span>
+              )}
+            </section>
           </form>
         </CardContent>
       </Card>
