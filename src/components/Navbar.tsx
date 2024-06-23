@@ -18,7 +18,11 @@ const Navbar = () => {
         </Link>
 
         <section className="flex items-center space-x-4">
-          <article className="relative">
+          <Link 
+            href="https://twitter.com/MalcolmTech"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="relative">
             <Image
               src='/assets/navbar/x.jpeg'
               alt='hero image'
@@ -26,7 +30,7 @@ const Navbar = () => {
               height={24}
               className="text-black dark:text-white cursor-pointer"
             />
-          </article>
+          </Link>
           <Link
             href="https://github.com/mutaremalcolm/Thymia"
             target="_blank"
