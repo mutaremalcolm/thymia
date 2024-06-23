@@ -45,6 +45,7 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
   }, [userName]);
 
   const restartGame = () => {
+    toast.success('Event Logged: Game Restarted')
     setCorrectAnswers(0);
     setWrongAnswers(0);
     setGameOver(false);
@@ -52,6 +53,7 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const goToHome = () => {
+     toast.success('Event Logged: Back to Home')
      router.push("./")
   }
 
