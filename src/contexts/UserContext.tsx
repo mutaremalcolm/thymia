@@ -2,8 +2,9 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
-interface UserContextType {
+export interface UserContextType {
   userName: string;
   setUserName: React.Dispatch<React.SetStateAction<string>>;
   correctAnswers: number;
@@ -12,6 +13,8 @@ interface UserContextType {
   setWrongAnswers: React.Dispatch<React.SetStateAction<number>>;
   gameOver: boolean;
   setGameOver: React.Dispatch<React.SetStateAction<boolean>>;
+  gameEndReason: string;
+  setGameEndReason: React.Dispatch<React.SetStateAction<string>>;
   restartGame: () => void;
   logout: () => void;
 }
@@ -23,6 +26,7 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
   const [correctAnswers, setCorrectAnswers] = useState<number>(0);
   const [wrongAnswers, setWrongAnswers] = useState<number>(0);
   const [gameOver, setGameOver] = useState<boolean>(false);
+  const [gameEndReason, setGameEndReason] = useState<string>('');
   const router = useRouter();
 
   useEffect(() => {
@@ -44,6 +48,7 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
     setCorrectAnswers(0);
     setWrongAnswers(0);
     setGameOver(false);
+    setGameEndReason('');
   };
 
   const goToHome = () => {
@@ -51,14 +56,14 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
   }
 
   const logout = () => {
+    toast.success('Event Logged: Log Out Successful')
     setUserName('');
     localStorage.removeItem('userName');
     goToHome();
-  
   };
 
   return (
-    <UserContext.Provider value={{ userName, setUserName, correctAnswers, setCorrectAnswers, wrongAnswers, setWrongAnswers, gameOver, setGameOver, restartGame, logout }}>
+    <UserContext.Provider value={{ userName, setUserName, correctAnswers, setCorrectAnswers, wrongAnswers, setWrongAnswers, gameOver, setGameOver, gameEndReason, setGameEndReason, restartGame, logout }}>
       {children}
     </UserContext.Provider>
   );

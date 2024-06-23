@@ -46,6 +46,7 @@ export default function Home() {
 
   const onSubmit: SubmitHandler<NameSchemaType> = async (data) => {
     try {
+      toast.success('Event Logged: Log in Successful')
       setUserName(data.name);
       router.push("./game");
     } catch (err: any) {
@@ -95,7 +96,10 @@ export default function Home() {
                 {...register("name")}
                 onKeyDown={() => clearErrors()}
               />
-              <Button className="mt-4 md:mt-0 md:ml-4" type="submit">
+              <Button 
+               className="mt-4 md:mt-0 md:ml-4"
+               type="submit" 
+               >
                 Start
               </Button>
             </section>
@@ -112,3 +116,7 @@ export default function Home() {
     </main>
   );
 }
+function preventDefault() {
+  throw new Error("Function not implemented.");
+}
+
