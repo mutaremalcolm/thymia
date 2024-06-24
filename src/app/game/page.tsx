@@ -1,29 +1,26 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
+import Header from "@/components/Header";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import React, { useState, useEffect } from "react";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import Header from "@/components/Header";
 import { useUserContext, UserContextType } from "../../contexts/UserContext";
 
 const Game: React.FC = () => {
   const {
-    correctAnswers,
     setCorrectAnswers,
     wrongAnswers,
     setWrongAnswers,
     restartGame,
     gameOver,
     setGameOver,
-    gameEndReason,
     setGameEndReason,
     logout,
   } = useUserContext() as UserContextType; // Asserting the correct type for context
@@ -32,9 +29,6 @@ const Game: React.FC = () => {
   const [questionsRemaining, setQuestionsRemaining] = useState<number>(15);
   const [currentLetter, setCurrentLetter] = useState<string>("");
   const [letters, setLetters] = useState<string[]>([]);
-  const router = useRouter();
-
-  const allowedLetters: string[] = ["A", "B", "C", ];
 
   useEffect(() => {
     if (!gameOver && questionsRemaining > 0) {
@@ -42,7 +36,7 @@ const Game: React.FC = () => {
         setQuestionsRemaining((prev) => {
           const newCount = prev - 1;
           if (newCount <= 0) {
-            endGame('completed');
+            endGame("completed");
           }
           return newCount;
         });
@@ -57,6 +51,8 @@ const Game: React.FC = () => {
       generateNewLetter();
     }
   }, [gameOver, questionsRemaining]);
+
+  const allowedLetters: string[] = ["A", "B", "C"];
 
   const generateNewLetter = () => {
     const letter: string =
@@ -88,7 +84,7 @@ const Game: React.FC = () => {
 
   const progressGame = () => {
     if (wrongAnswers + 1 >= 3) {
-      endGame('wrongAnswers');
+      endGame("wrongAnswers");
       return;
     }
   };
@@ -106,7 +102,7 @@ const Game: React.FC = () => {
     setLetters([]);
     setCurrentLetter("");
     setGameOver(false);
-    setGameEndReason('');
+    setGameEndReason("");
     restartGame();
   };
 
@@ -131,7 +127,6 @@ const Game: React.FC = () => {
             </CardDescription>
           </div>
         </CardHeader>
-        <CardContent></CardContent>
       </Card>
       <div className="flex flex-row mt-5">
         {gameOver ? (

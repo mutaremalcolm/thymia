@@ -116,7 +116,5 @@ export default function Home() {
     </main>
   );
 }
-function preventDefault() {
-  throw new Error("Function not implemented.");
-}
+
 

@@ -1,9 +1,13 @@
-"use client"
+"use client";
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import toast from 'react-hot-toast';
-
+import toast from "react-hot-toast";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 export interface UserContextType {
   userName: string;
   setUserName: React.Dispatch<React.SetStateAction<string>>;
@@ -22,15 +26,14 @@ export interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserContextProvider = ({ children }: { children: ReactNode }) => {
-  const [userName, setUserName] = useState<string>('');
-  const [correctAnswers, setCorrectAnswers] = useState<number>(0);
-  const [wrongAnswers, setWrongAnswers] = useState<number>(0);
+  const [userName, setUserName] = useState<string>("");
   const [gameOver, setGameOver] = useState<boolean>(false);
-  const [gameEndReason, setGameEndReason] = useState<string>('');
-  const router = useRouter();
+  const [wrongAnswers, setWrongAnswers] = useState<number>(0);
+  const [gameEndReason, setGameEndReason] = useState<string>("");
+  const [correctAnswers, setCorrectAnswers] = useState<number>(0);
 
   useEffect(() => {
-    const storedUserName = localStorage.getItem('userName');
+    const storedUserName = localStorage.getItem("userName");
     if (storedUserName) {
       setUserName(storedUserName);
     }
@@ -38,34 +41,43 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (userName) {
-      localStorage.setItem('userName', userName);
+      localStorage.setItem("userName", userName);
     } else {
-      localStorage.removeItem('userName');
+      localStorage.removeItem("userName");
     }
   }, [userName]);
 
   const restartGame = () => {
-    toast.success('Event Logged: Game Restarted')
     setCorrectAnswers(0);
     setWrongAnswers(0);
     setGameOver(false);
-    setGameEndReason('');
+    setGameEndReason("");
+    toast.success("Event Logged: Game Restarted");
   };
 
-  const goToHome = () => {
-     toast.success('Event Logged: Back to Home')
-     router.push("./")
-  }
-
   const logout = () => {
-    toast.success('Event Logged: Log Out Successful')
-    setUserName('');
-    localStorage.removeItem('userName');
-    goToHome();
+    setUserName("");
+    localStorage.removeItem("userName");
+    toast.success("Event Logged: Log Out Successful");
   };
 
   return (
-    <UserContext.Provider value={{ userName, setUserName, correctAnswers, setCorrectAnswers, wrongAnswers, setWrongAnswers, gameOver, setGameOver, gameEndReason, setGameEndReason, restartGame, logout }}>
+    <UserContext.Provider
+      value={{
+        userName,
+        setUserName,
+        correctAnswers,
+        setCorrectAnswers,
+        wrongAnswers,
+        setWrongAnswers,
+        gameOver,
+        setGameOver,
+        gameEndReason,
+        setGameEndReason,
+        restartGame,
+        logout,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );
