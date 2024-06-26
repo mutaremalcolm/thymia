@@ -29,7 +29,7 @@ const Game: React.FC = () => {
   const [questionsRemaining, setQuestionsRemaining] = useState<number>(15);
   const [currentLetter, setCurrentLetter] = useState<string>("");
   const [letters, setLetters] = useState<string[]>([]);
-
+  
   useEffect(() => {
     if (!gameOver && questionsRemaining > 0) {
       const interval = setInterval(() => {

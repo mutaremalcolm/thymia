@@ -1,13 +1,15 @@
 "use client";
 
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import React, {
   createContext,
   useContext,
   useState,
   ReactNode,
-  useEffect,
 } from "react";
+
+
 export interface UserContextType {
   userName: string;
   setUserName: React.Dispatch<React.SetStateAction<string>>;
@@ -26,26 +28,13 @@ export interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserContextProvider = ({ children }: { children: ReactNode }) => {
+  const router = useRouter();
   const [userName, setUserName] = useState<string>("");
   const [gameOver, setGameOver] = useState<boolean>(false);
   const [wrongAnswers, setWrongAnswers] = useState<number>(0);
   const [gameEndReason, setGameEndReason] = useState<string>("");
   const [correctAnswers, setCorrectAnswers] = useState<number>(0);
-
-  useEffect(() => {
-    const storedUserName = localStorage.getItem("userName");
-    if (storedUserName) {
-      setUserName(storedUserName);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (userName) {
-      localStorage.setItem("userName", userName);
-    } else {
-      localStorage.removeItem("userName");
-    }
-  }, [userName]);
+  
 
   const restartGame = () => {
     setCorrectAnswers(0);
@@ -57,7 +46,7 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     setUserName("");
-    localStorage.removeItem("userName");
+    router.push("./");
     toast.success("Event Logged: Log Out Successful");
   };
 

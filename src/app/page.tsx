@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useUserContext } from "../contexts/UserContext";
 import {
   Card,
   CardContent,
@@ -15,7 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useUserContext } from "../contexts/UserContext";
+
 
 const NameSchema = z.object({
   name: z
