@@ -1,17 +1,13 @@
-"use client";
+"use client"
 
 import toast from "react-hot-toast";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import React, { useReducer, useEffect, useCallback } from "react";
 import { useUserContext, UserContextType } from "../../contexts/UserContext";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { gameEventEmitter, APIResponsePayload } from '../eventEmmiter.tsx/api';
+// import ApiResponseSimulator from '../event.emmiter.tsx/api';
 
 // Initial state type
 type State = {
@@ -93,32 +89,55 @@ const Game: React.FC = () => {
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const allowedLetters: string[] = ["A", "B", "C"];
+  const allowedEmojis: string[] = ["🚀", "🌍", "🚜"];
 
-  const generateNewLetter = useCallback(() => {
-    const letter: string =
-      allowedLetters[Math.floor(Math.random() * allowedLetters.length)];
-      dispatch({ type: actionTypes.SET_LETTER, payload: letter });
-  }, [allowedLetters]);
+  // Weighted random selection
+  const generateNewEmoji = useCallback(() => {
+    const emojiWeights: any = {
+      "🚀": 0.4,  // 40% chance
+      "🌍": 0.4,  // 40% chance
+      "🚜": 0.2   // 20% chance
+    };
+
+    const random = Math.random();
+    let cumulativeWeight = 0;
+    let selectedEmoji = allowedEmojis[0];
+
+    for (const emoji of allowedEmojis) {
+      cumulativeWeight += emojiWeights[emoji];
+      if (random < cumulativeWeight) {
+        selectedEmoji = emoji;
+        break;
+      }
+    }
+
+    dispatch({ type: actionTypes.SET_LETTER, payload: selectedEmoji });
+  }, [allowedEmojis]);
 
   useEffect(() => {
-    if (!state.isGameOver && state.questionsRemaining > 0) {
-      const interval = setInterval(() => {
-        dispatch({ type: actionTypes.DECREMENT_COUNT });
-        generateNewLetter();
-      }, 2000);
-      return () => clearInterval(interval);
+    if (!state.isGameOver) {
+      if (state.questionsRemaining <= 0) {
+        dispatch({ type: actionTypes.SET_GAME_OVER });
+        setGameEndReason("completed");
+        setGameOver(true);
+      } else {
+        const interval = setInterval(() => {
+          dispatch({ type: actionTypes.DECREMENT_COUNT });
+          generateNewEmoji();
+        }, 2000);
+        return () => clearInterval(interval);
+      }
     }
-  }, [state.isGameOver, state.questionsRemaining, generateNewLetter]);
+  }, [state.isGameOver, state.questionsRemaining, generateNewEmoji, setGameEndReason, setGameOver]);
 
   const handleSeenIt = () => {
     if (state.letters.length < 2) {
-      toast.error("Not enough letters to compare");
+      toast.error("Not enough emojis to compare");
       return;
     }
 
-    const letter2Back: string | undefined = state.letters[state.letters.length - 2];
-    if (letter2Back === state.currentLetter) {
+    const Emoji_2_Positions_Back: string | undefined = state.letters[state.letters.length - 2];
+    if (Emoji_2_Positions_Back === state.currentLetter) {
       toast.success("Event Logged: Correct Answer");
       setCorrectAnswers((prev) => prev + 1);
     } else {
@@ -132,6 +151,15 @@ const Game: React.FC = () => {
       setGameEndReason(state.wrongAnswers + 1 >= 3 ? "wrongAnswers" : "completed");
       setGameOver(true);
     }
+
+    // Simulate API call response
+    setTimeout(() => {
+      const response: APIResponsePayload = {
+        success: true,
+        message: 'API call simulated successfully'
+      };
+      gameEventEmitter.emit('apiResponse', response);
+    }, 1000); // Simulate network delay
   };
 
   const handleRestart = () => {
@@ -142,13 +170,13 @@ const Game: React.FC = () => {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
+    <main className="flex min-h-screen flex-col items-center justify-center p-6 md:p-24">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-center mb-5">
             <Header />
           </CardTitle>
-          <div className="flex justify-between mb-5">
+          <div className="flex justify-evenly mb-5 text-sm md:text-base">
             <CardDescription>Chances Left: {state.chancesLeft}</CardDescription>
             <CardDescription>
               Questions Remaining: {state.questionsRemaining}
@@ -156,29 +184,31 @@ const Game: React.FC = () => {
           </div>
           <div className="text-center mt-5">
             <CardDescription>
-              <div className="mt-5 text-9xl text-black dark:text-white">
+              <div className="mt-5 text-6xl md:text-9xl text-black dark:text-white">
                 {state.currentLetter}
               </div>
             </CardDescription>
           </div>
         </CardHeader>
       </Card>
-      <div className="flex flex-row mt-5">
+      <div className="flex flex-col md:flex-row mt-5 space-y-4 md:space-y-0 md:space-x-5">
         {state.isGameOver ? (
           <Button onClick={handleRestart}>Start</Button>
         ) : (
           <Button onClick={handleSeenIt}>Seen It</Button>
         )}
-        <Button className="ml-5" onClick={logout}>
+        <Button onClick={logout}>
           Logout
         </Button>
       </div>
-      <div className="flex items-center mt-10 mb-4">
+      <div className="flex items-center mt-10 mb-4 text-sm md:text-base">
         <span>
           Practice helps your memory get better. The more you play the better
           you get.
         </span>
       </div>
+      {/* Include the API Response Simulator */}
+      {/* <ApiResponseSimulator /> */}
     </main>
   );
 };
