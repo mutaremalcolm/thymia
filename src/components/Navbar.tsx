@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import ModeToggle from '../components/ThemeToggle';
-import { X, GitBranch, Brain } from 'lucide-react';
+import React from "react";
+import Link from "next/link";
+import Image from "next/image";
+import ModeToggle from "../components/ThemeToggle";
+import { GitBranch, Brain } from "lucide-react";
 
 const Navbar = () => {
   return (
@@ -18,14 +18,15 @@ const Navbar = () => {
         </Link>
 
         <section className="flex items-center space-x-4">
-          <Link 
+          <Link
             href="https://twitter.com/MalcolmTech"
             target="_blank"
             rel="noopener noreferrer"
-            className="relative">
+            className="relative"
+          >
             <Image
-              src='/assets/navbar/x.jpeg'
-              alt='hero image'
+              src="/assets/navbar/x.jpeg"
+              alt="hero image"
               width={24}
               height={24}
               className="text-black dark:text-white cursor-pointer"

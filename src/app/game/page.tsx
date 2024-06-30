@@ -1,154 +1,214 @@
 "use client"
 
-import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import Header from "@/components/Header";
+import { Button } from "@/components/ui/button";
+import React, { useReducer, useEffect, useCallback } from "react";
 import { useUserContext, UserContextType } from "../../contexts/UserContext";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { gameEventEmitter, APIResponsePayload } from '../eventEmmiter.tsx/api';
+// import ApiResponseSimulator from '../event.emmiter.tsx/api';
+
+// Initial state type
+type State = {
+  chancesLeft: number;
+  questionsRemaining: number;
+  currentLetter: string;
+  letters: string[];
+  isGameOver: boolean;
+  wrongAnswers: number;
+};
+
+// Initial state
+const initialState: State = {
+  chancesLeft: 3,
+  questionsRemaining: 15,
+  currentLetter: "",
+  letters: [],
+  isGameOver: false,
+  wrongAnswers: 0,
+};
+
+// Action types
+const actionTypes = {
+  SET_LETTER: "SET_LETTER",
+  DECREMENT_COUNT: "DECREMENT_COUNT",
+  SET_GAME_OVER: "SET_GAME_OVER",
+  RESET_GAME: "RESET_GAME",
+  INCREMENT_WRONG_ANSWERS: "INCREMENT_WRONG_ANSWERS",
+} as const;
+
+// Action type definitions
+type Action =
+  | { type: typeof actionTypes.SET_LETTER; payload: string }
+  | { type: typeof actionTypes.DECREMENT_COUNT; payload?: boolean }
+  | { type: typeof actionTypes.SET_GAME_OVER }
+  | { type: typeof actionTypes.RESET_GAME }
+  | { type: typeof actionTypes.INCREMENT_WRONG_ANSWERS };
+
+// Reducer function
+const reducer = (state: State, action: Action): State => {
+  switch (action.type) {
+    case actionTypes.SET_LETTER:
+      return {
+        ...state,
+        currentLetter: action.payload,
+        letters: [...state.letters, action.payload],
+      };
+    case actionTypes.DECREMENT_COUNT:
+      return {
+        ...state,
+        questionsRemaining: state.questionsRemaining - 1,
+        chancesLeft: action.payload ? state.chancesLeft - 1 : state.chancesLeft,
+      };
+    case actionTypes.SET_GAME_OVER:
+      return {
+        ...state,
+        isGameOver: true,
+      };
+    case actionTypes.RESET_GAME:
+      return initialState;
+    case actionTypes.INCREMENT_WRONG_ANSWERS:
+      return {
+        ...state,
+        wrongAnswers: state.wrongAnswers + 1,
+      };
+    default:
+      return state;
+  }
+};
 
 const Game: React.FC = () => {
   const {
-    correctAnswers,
     setCorrectAnswers,
-    wrongAnswers,
-    setWrongAnswers,
     restartGame,
-    gameOver,
     setGameOver,
-    gameEndReason,
     setGameEndReason,
     logout,
   } = useUserContext() as UserContextType; // Asserting the correct type for context
 
-  const [chancesLeft, setChancesLeft] = useState<number>(3);
-  const [questionsRemaining, setQuestionsRemaining] = useState<number>(15);
-  const [currentLetter, setCurrentLetter] = useState<string>("");
-  const [letters, setLetters] = useState<string[]>([]);
-  const router = useRouter();
+  const [state, dispatch] = useReducer(reducer, initialState);
 
-  const allowedLetters: string[] = ["A", "B", "C", ];
+  const allowedEmojis: string[] = ["🚀", "🌍", "🚜"];
+
+  // Weighted random selection
+  const generateNewEmoji = useCallback(() => {
+    const emojiWeights: any = {
+      "🚀": 0.4,  // 40% chance
+      "🌍": 0.4,  // 40% chance
+      "🚜": 0.2   // 20% chance
+    };
+
+    const random = Math.random();
+    let cumulativeWeight = 0;
+    let selectedEmoji = allowedEmojis[0];
+
+    for (const emoji of allowedEmojis) {
+      cumulativeWeight += emojiWeights[emoji];
+      if (random < cumulativeWeight) {
+        selectedEmoji = emoji;
+        break;
+      }
+    }
+
+    dispatch({ type: actionTypes.SET_LETTER, payload: selectedEmoji });
+  }, [allowedEmojis]);
 
   useEffect(() => {
-    if (!gameOver && questionsRemaining > 0) {
-      const interval = setInterval(() => {
-        setQuestionsRemaining((prev) => {
-          const newCount = prev - 1;
-          if (newCount <= 0) {
-            endGame('completed');
-          }
-          return newCount;
-        });
-        generateNewLetter();
-      }, 2000);
-      return () => clearInterval(interval);
+    if (!state.isGameOver) {
+      if (state.questionsRemaining <= 0) {
+        dispatch({ type: actionTypes.SET_GAME_OVER });
+        setGameEndReason("completed");
+        setGameOver(true);
+      } else {
+        const interval = setInterval(() => {
+          dispatch({ type: actionTypes.DECREMENT_COUNT });
+          generateNewEmoji();
+        }, 2000);
+        return () => clearInterval(interval);
+      }
     }
-  }, [gameOver, questionsRemaining]);
-
-  useEffect(() => {
-    if (!gameOver && questionsRemaining > 0) {
-      generateNewLetter();
-    }
-  }, [gameOver, questionsRemaining]);
-
-  const generateNewLetter = () => {
-    const letter: string =
-      allowedLetters[Math.floor(Math.random() * allowedLetters.length)];
-    setLetters((prevLetters) => {
-      const newLetters = [...prevLetters, letter];
-      setCurrentLetter(letter);
-      return newLetters;
-    });
-  };
+  }, [state.isGameOver, state.questionsRemaining, generateNewEmoji, setGameEndReason, setGameOver]);
 
   const handleSeenIt = () => {
-    if (letters.length < 3) {
-      toast.error("Not enough letters to compare");
+    if (state.letters.length < 2) {
+      toast.error("Not enough emojis to compare");
       return;
     }
 
-    const letter2Back: string | undefined = letters[letters.length - 2];
-    if (letter2Back === currentLetter) {
+    const Emoji_2_Positions_Back: string | undefined = state.letters[state.letters.length - 2];
+    if (Emoji_2_Positions_Back === state.currentLetter) {
       toast.success("Event Logged: Correct Answer");
       setCorrectAnswers((prev) => prev + 1);
     } else {
       toast.error("Event Logged: Incorrect Answer");
-      setWrongAnswers((prev) => prev + 1);
-      setChancesLeft((prev) => prev - 1);
+      dispatch({ type: actionTypes.INCREMENT_WRONG_ANSWERS });
+      dispatch({ type: actionTypes.DECREMENT_COUNT, payload: true });
     }
-    progressGame();
-  };
 
-  const progressGame = () => {
-    if (wrongAnswers + 1 >= 3) {
-      endGame('wrongAnswers');
-      return;
+    if (state.wrongAnswers + 1 >= 3 || state.questionsRemaining - 1 <= 0) {
+      dispatch({ type: actionTypes.SET_GAME_OVER });
+      setGameEndReason(state.wrongAnswers + 1 >= 3 ? "wrongAnswers" : "completed");
+      setGameOver(true);
     }
-  };
 
-  const endGame = (reason: string) => {
-    setGameOver(true);
-    setGameEndReason(reason);
+    // Simulate API call response
+    setTimeout(() => {
+      const response: APIResponsePayload = {
+        success: true,
+        message: 'API call simulated successfully'
+      };
+      gameEventEmitter.emit('apiResponse', response);
+    }, 1000); // Simulate network delay
   };
 
   const handleRestart = () => {
-    setChancesLeft(3);
-    setQuestionsRemaining(15);
-    setWrongAnswers(0);
-    setCorrectAnswers(0);
-    setLetters([]);
-    setCurrentLetter("");
+    dispatch({ type: actionTypes.RESET_GAME });
     setGameOver(false);
-    setGameEndReason('');
+    setGameEndReason("");
     restartGame();
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
+    <main className="flex min-h-screen flex-col items-center justify-center p-6 md:p-24">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-center mb-5">
             <Header />
           </CardTitle>
-          <div className="flex justify-between mb-5">
-            <CardDescription>Chances Left: {chancesLeft}</CardDescription>
+          <div className="flex justify-evenly mb-5 text-sm md:text-base">
+            <CardDescription>Chances Left: {state.chancesLeft}</CardDescription>
             <CardDescription>
-              Questions Remaining: {questionsRemaining}
+              Questions Remaining: {state.questionsRemaining}
             </CardDescription>
           </div>
           <div className="text-center mt-5">
             <CardDescription>
-              <div className="mt-5 text-9xl text-black dark:text-white">
-                {currentLetter}
+              <div className="mt-5 text-6xl md:text-9xl text-black dark:text-white">
+                {state.currentLetter}
               </div>
             </CardDescription>
           </div>
         </CardHeader>
-        <CardContent></CardContent>
       </Card>
-      <div className="flex flex-row mt-5">
-        {gameOver ? (
+      <div className="flex flex-col md:flex-row mt-5 space-y-4 md:space-y-0 md:space-x-5">
+        {state.isGameOver ? (
           <Button onClick={handleRestart}>Start</Button>
         ) : (
           <Button onClick={handleSeenIt}>Seen It</Button>
         )}
-        <Button className="ml-5" onClick={logout}>
+        <Button onClick={logout}>
           Logout
         </Button>
       </div>
-      <div className="flex items-center mt-10 mb-4">
+      <div className="flex items-center mt-10 mb-4 text-sm md:text-base">
         <span>
           Practice helps your memory get better. The more you play the better
           you get.
         </span>
       </div>
+      {/* Include the API Response Simulator */}
+      {/* <ApiResponseSimulator /> */}
     </main>
   );
 };
