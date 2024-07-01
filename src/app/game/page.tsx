@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import toast from "react-hot-toast";
 import Header from "@/components/Header";
@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import React, { useReducer, useEffect, useCallback } from "react";
 import { useUserContext, UserContextType } from "../../contexts/UserContext";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { gameEventEmitter, APIResponsePayload } from '../eventEmmiter.tsx/api';
+import { gameEventEmitter, APIResponsePayload } from '../eventEmmiter/api';
 // import ApiResponseSimulator from '../event.emmiter.tsx/api';
 
 // Initial state type
@@ -80,7 +80,7 @@ const reducer = (state: State, action: Action): State => {
 
 const Game: React.FC = () => {
   const {
-    setCorrectAnswers,
+    dispatch: userDispatch,
     restartGame,
     setGameOver,
     setGameEndReason,
@@ -118,8 +118,8 @@ const Game: React.FC = () => {
     if (!state.isGameOver) {
       if (state.questionsRemaining <= 0) {
         dispatch({ type: actionTypes.SET_GAME_OVER });
-        setGameEndReason("completed");
-        setGameOver(true);
+        userDispatch({ type: 'SET_GAME_END_REASON', payload: "completed" });
+        userDispatch({ type: 'SET_GAME_OVER', payload: true });
       } else {
         const interval = setInterval(() => {
           dispatch({ type: actionTypes.DECREMENT_COUNT });
@@ -128,7 +128,7 @@ const Game: React.FC = () => {
         return () => clearInterval(interval);
       }
     }
-  }, [state.isGameOver, state.questionsRemaining, generateNewEmoji, setGameEndReason, setGameOver]);
+  }, [state.isGameOver, state.questionsRemaining, generateNewEmoji, userDispatch]);
 
   const handleSeenIt = () => {
     if (state.letters.length < 2) {
@@ -139,7 +139,7 @@ const Game: React.FC = () => {
     const Emoji_2_Positions_Back: string | undefined = state.letters[state.letters.length - 2];
     if (Emoji_2_Positions_Back === state.currentLetter) {
       toast.success("Event Logged: Correct Answer");
-      setCorrectAnswers((prev) => prev + 1);
+      userDispatch({ type: 'SET_CORRECT_ANSWERS', payload: state.correctAnswers + 1 });
     } else {
       toast.error("Event Logged: Incorrect Answer");
       dispatch({ type: actionTypes.INCREMENT_WRONG_ANSWERS });
@@ -148,8 +148,8 @@ const Game: React.FC = () => {
 
     if (state.wrongAnswers + 1 >= 3 || state.questionsRemaining - 1 <= 0) {
       dispatch({ type: actionTypes.SET_GAME_OVER });
-      setGameEndReason(state.wrongAnswers + 1 >= 3 ? "wrongAnswers" : "completed");
-      setGameOver(true);
+      userDispatch({ type: 'SET_GAME_END_REASON', payload: state.wrongAnswers + 1 >= 3 ? "wrongAnswers" : "completed" });
+      userDispatch({ type: 'SET_GAME_OVER', payload: true });
     }
 
     // Simulate API call response
@@ -164,8 +164,8 @@ const Game: React.FC = () => {
 
   const handleRestart = () => {
     dispatch({ type: actionTypes.RESET_GAME });
-    setGameOver(false);
-    setGameEndReason("");
+    userDispatch({ type: 'SET_GAME_OVER', payload: false });
+    userDispatch({ type: 'SET_GAME_END_REASON', payload: "" });
     restartGame();
   };
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { gameEventEmitter, APIResponsePayload } from '../eventEmmiter.tsx/api';
+import { gameEventEmitter, APIResponsePayload } from './api';
 
 const ApiResponseSimulator: React.FC = () => {
   const [responseMessage, setResponseMessage] = useState<string | null>(null);

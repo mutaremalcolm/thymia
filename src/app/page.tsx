@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import * as z from "zod";
 import toast from "react-hot-toast";
@@ -17,7 +17,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-
 const NameSchema = z.object({
   name: z
     .string()
@@ -29,7 +28,7 @@ const NameSchema = z.object({
 type NameSchemaType = z.infer<typeof NameSchema>;
 
 export default function Home() {
-  const { setUserName } = useUserContext();
+  const { dispatch } = useUserContext();
   const router = useRouter();
 
   const {
@@ -47,8 +46,8 @@ export default function Home() {
 
   const onSubmit: SubmitHandler<NameSchemaType> = async (data) => {
     try {
-      toast.success('Event Logged: Log in Successful')
-      setUserName(data.name);
+      toast.success('Event Logged: Log in Successful');
+      dispatch({ type: 'SET_USER_NAME', payload: data.name });
       router.push("./game");
     } catch (err: any) {
       toast.error("Something went wrong. Please try again later.");
@@ -117,5 +116,3 @@ export default function Home() {
     </main>
   );
 }
-
-

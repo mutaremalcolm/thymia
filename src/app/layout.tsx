@@ -21,22 +21,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <UserContextProvider>
-          <Toaster
-          position="bottom-center"
-          reverseOrder={false}
-          />
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
-          >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <UserContextProvider>
+            <Toaster position="bottom-center" reverseOrder={false} />
             <Navbar />
             {children}
-          </ThemeProvider>
-          
-        </UserContextProvider>
+          </UserContextProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
