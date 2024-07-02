@@ -4,10 +4,8 @@ import toast from "react-hot-toast";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import React, { useReducer, useEffect, useCallback } from "react";
-import { useUserContext, UserContextType } from "../../contexts/UserContext";
+import { useUserContext } from "../../contexts/UserContext";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { gameEventEmitter, APIResponsePayload } from '../eventEmmiter/api';
-// import ApiResponseSimulator from '../event.emmiter.tsx/api';
 
 // Initial state type
 type State = {
@@ -80,12 +78,11 @@ const reducer = (state: State, action: Action): State => {
 
 const Game: React.FC = () => {
   const {
+    state: userState,
     dispatch: userDispatch,
     restartGame,
-    setGameOver,
-    setGameEndReason,
     logout,
-  } = useUserContext() as UserContextType; // Asserting the correct type for context
+  } = useUserContext();
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
@@ -94,9 +91,9 @@ const Game: React.FC = () => {
   // Weighted random selection
   const generateNewEmoji = useCallback(() => {
     const emojiWeights: any = {
-      "🚀": 0.4,  // 40% chance
-      "🌍": 0.4,  // 40% chance
-      "🚜": 0.2   // 20% chance
+      "🚀": 0.4, // 40% chance
+      "🌍": 0.4, // 40% chance
+      "🚜": 0.2, // 20% chance
     };
 
     const random = Math.random();
@@ -118,8 +115,8 @@ const Game: React.FC = () => {
     if (!state.isGameOver) {
       if (state.questionsRemaining <= 0) {
         dispatch({ type: actionTypes.SET_GAME_OVER });
-        userDispatch({ type: 'SET_GAME_END_REASON', payload: "completed" });
-        userDispatch({ type: 'SET_GAME_OVER', payload: true });
+        userDispatch({ type: "SET_GAME_OVER", payload: true });
+        userDispatch({ type: "SET_GAME_END_REASON", payload: "completed" });
       } else {
         const interval = setInterval(() => {
           dispatch({ type: actionTypes.DECREMENT_COUNT });
@@ -139,7 +136,7 @@ const Game: React.FC = () => {
     const Emoji_2_Positions_Back: string | undefined = state.letters[state.letters.length - 2];
     if (Emoji_2_Positions_Back === state.currentLetter) {
       toast.success("Event Logged: Correct Answer");
-      userDispatch({ type: 'SET_CORRECT_ANSWERS', payload: state.correctAnswers + 1 });
+      userDispatch({ type: "SET_CORRECT_ANSWERS", payload: userState.correctAnswers + 1 });
     } else {
       toast.error("Event Logged: Incorrect Answer");
       dispatch({ type: actionTypes.INCREMENT_WRONG_ANSWERS });
@@ -148,24 +145,14 @@ const Game: React.FC = () => {
 
     if (state.wrongAnswers + 1 >= 3 || state.questionsRemaining - 1 <= 0) {
       dispatch({ type: actionTypes.SET_GAME_OVER });
-      userDispatch({ type: 'SET_GAME_END_REASON', payload: state.wrongAnswers + 1 >= 3 ? "wrongAnswers" : "completed" });
-      userDispatch({ type: 'SET_GAME_OVER', payload: true });
+      userDispatch({ type: "SET_GAME_OVER", payload: true });
+      userDispatch({ type: "SET_GAME_END_REASON", payload: state.wrongAnswers + 1 >= 3 ? "wrongAnswers" : "completed" });
     }
-
-    // Simulate API call response
-    setTimeout(() => {
-      const response: APIResponsePayload = {
-        success: true,
-        message: 'API call simulated successfully'
-      };
-      gameEventEmitter.emit('apiResponse', response);
-    }, 1000); // Simulate network delay
   };
 
   const handleRestart = () => {
     dispatch({ type: actionTypes.RESET_GAME });
-    userDispatch({ type: 'SET_GAME_OVER', payload: false });
-    userDispatch({ type: 'SET_GAME_END_REASON', payload: "" });
+    userDispatch({ type: "RESET_GAME" });
     restartGame();
   };
 
@@ -207,8 +194,6 @@ const Game: React.FC = () => {
           you get.
         </span>
       </div>
-      {/* Include the API Response Simulator */}
-      {/* <ApiResponseSimulator /> */}
     </main>
   );
 };

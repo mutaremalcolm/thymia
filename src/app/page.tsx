@@ -3,7 +3,7 @@
 import * as z from "zod";
 import toast from "react-hot-toast";
 import { Brain } from "lucide-react";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,7 +23,7 @@ const NameSchema = z.object({
     .trim()
     .min(1, { message: "Name is required to proceed" })
     .min(3, { message: "Name is too short" })
-    .max(15, { message: "Username is too long" })
+    .max(15, { message: "Username is too long" }),
 });
 type NameSchemaType = z.infer<typeof NameSchema>;
 
@@ -46,8 +46,8 @@ export default function Home() {
 
   const onSubmit: SubmitHandler<NameSchemaType> = async (data) => {
     try {
-      toast.success('Event Logged: Log in Successful');
-      dispatch({ type: 'SET_USER_NAME', payload: data.name });
+      toast.success("Event Logged: Log in Successful");
+      dispatch({ type: "SET_USER_NAME", payload: data.name });
       router.push("./game");
     } catch (err: any) {
       toast.error("Something went wrong. Please try again later.");
@@ -90,16 +90,13 @@ export default function Home() {
               <span>Please enter your name below & press start button</span>
             </section>
             <section className="flex flex-col items-center md:flex-row md:justify-center mb-4">
-              <Input 
-                className="w-full md:w-1/2" 
-                placeholder="Enter your name" 
+              <Input
+                className="w-full md:w-1/2"
+                placeholder="Enter your name"
                 {...register("name")}
                 onKeyDown={() => clearErrors()}
               />
-              <Button 
-               className="mt-4 md:mt-0 md:ml-4"
-               type="submit" 
-               >
+              <Button className="mt-4 md:mt-0 md:ml-4" type="submit">
                 Start
               </Button>
             </section>

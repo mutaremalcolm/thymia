@@ -2,7 +2,9 @@ import React from "react";
 import { useUserContext } from "../contexts/UserContext";
 
 const Header = () => {
-  const { userName, correctAnswers, gameOver, gameEndReason } = useUserContext();
+  const { state } = useUserContext();
+  const { userName, correctAnswers, gameOver, gameEndReason } = state;
+
   return (
     <div className="text-center text-lg md:text-xl lg:text-2xl p-4">
       {gameOver ? (
