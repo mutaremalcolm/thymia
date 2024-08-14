@@ -1,11 +1,11 @@
 "use client";
 
-import toast from "react-hot-toast";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import React, { useReducer, useEffect, useCallback } from "react";
 import { useUserContext } from "../../contexts/UserContext";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { sendAnalyticsEvent } from "@/lib/analytics";
 
 // Initial state type
 type State = {
@@ -82,6 +82,7 @@ const Game: React.FC = () => {
     dispatch: userDispatch,
     restartGame,
     logout,
+    showAnalytics,
   } = useUserContext();
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -129,16 +130,16 @@ const Game: React.FC = () => {
 
   const handleSeenIt = () => {
     if (state.letters.length < 2) {
-      toast.error("Not enough emojis to compare");
+      sendAnalyticsEvent(showAnalytics, "Not enough emojis to compare", "error");
       return;
     }
 
     const Emoji_2_Positions_Back: string | undefined = state.letters[state.letters.length - 2];
     if (Emoji_2_Positions_Back === state.currentLetter) {
-      toast.success("Event Logged: Correct Answer");
+      sendAnalyticsEvent(showAnalytics, "Correct Answer", "success");
       userDispatch({ type: "SET_CORRECT_ANSWERS", payload: userState.correctAnswers + 1 });
     } else {
-      toast.error("Event Logged: Incorrect Answer");
+      sendAnalyticsEvent(showAnalytics, "Incorrect Answer", "error");
       dispatch({ type: actionTypes.INCREMENT_WRONG_ANSWERS });
       dispatch({ type: actionTypes.DECREMENT_COUNT, payload: true });
     }

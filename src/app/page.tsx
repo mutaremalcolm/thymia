@@ -6,6 +6,8 @@ import { Brain } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { sendAnalyticsEvent } from "@/lib/analytics";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useUserContext } from "../contexts/UserContext";
@@ -28,7 +30,7 @@ const NameSchema = z.object({
 type NameSchemaType = z.infer<typeof NameSchema>;
 
 export default function Home() {
-  const { dispatch } = useUserContext();
+  const { dispatch, restartGame, showAnalytics, setShowAnalytics } = useUserContext();
   const router = useRouter();
 
   const {
@@ -45,12 +47,25 @@ export default function Home() {
   });
 
   const onSubmit: SubmitHandler<NameSchemaType> = async (data) => {
+    sendAnalyticsEvent(showAnalytics, "login button clicked");
     try {
-      toast.success("Event Logged: Log in Successful");
       dispatch({ type: "SET_USER_NAME", payload: data.name });
       router.push("./game");
+      restartGame();
+      sendAnalyticsEvent(showAnalytics, "Username set & Game Started");
     } catch (err: any) {
       toast.error("Something went wrong. Please try again later.");
+    }
+  };
+
+  const handleAnalyticsToggle = () => {
+    const newAnalyticsState = !showAnalytics;
+    setShowAnalytics(newAnalyticsState);
+
+    if (newAnalyticsState) {
+      toast.success("Event Logs: ON");
+    } else {
+      toast.error("Event Logs: OFF");
     }
   };
 
@@ -99,6 +114,13 @@ export default function Home() {
               <Button className="mt-4 md:mt-0 md:ml-4" type="submit">
                 Start
               </Button>
+            </section>
+            <section className="flex items-center justify-center pt-5">
+              <Checkbox 
+                checked={showAnalytics}
+                onCheckedChange={handleAnalyticsToggle} 
+              />
+              <span className="text-sm ml-3">Show event analytics</span>
             </section>
             <section className="flex h-4 md:w-full md:pl-2">
               {errors.name && (

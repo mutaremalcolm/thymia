@@ -2,9 +2,11 @@
 
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import React, { createContext, useContext, useReducer, ReactNode, Dispatch } from "react";
+import React, { createContext, useContext, useReducer, ReactNode, Dispatch, useState } from "react";
 
 export interface UserContextType {
+  showAnalytics: boolean;
+  setShowAnalytics: (show: boolean) => void;
   state: UserState;
   dispatch: Dispatch<UserAction>;
   restartGame: () => void;
@@ -59,6 +61,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserContextProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(userReducer, initialState);
   const router = useRouter();
+  const [showAnalytics, setShowAnalytics] = useState<boolean>(false);
 
   const restartGame = () => {
     dispatch({ type: "RESET_GAME" });
@@ -74,6 +77,8 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
   return (
     <UserContext.Provider
       value={{
+        showAnalytics,
+        setShowAnalytics,
         state,
         dispatch,
         restartGame,
@@ -92,3 +97,4 @@ export const useUserContext = () => {
   }
   return context;
 };
+ 
