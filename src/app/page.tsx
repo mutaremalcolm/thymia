@@ -1,11 +1,13 @@
-"use client"
+"use client";
 
 import * as z from "zod";
 import toast from "react-hot-toast";
 import { Brain } from "lucide-react";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { sendAnalyticsEvent } from "@/lib/analytics";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useUserContext } from "../contexts/UserContext";
@@ -17,19 +19,18 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-
 const NameSchema = z.object({
   name: z
     .string()
     .trim()
     .min(1, { message: "Name is required to proceed" })
     .min(3, { message: "Name is too short" })
-    .max(15, { message: "Username is too long" })
+    .max(15, { message: "Username is too long" }),
 });
 type NameSchemaType = z.infer<typeof NameSchema>;
 
 export default function Home() {
-  const { setUserName } = useUserContext();
+  const { dispatch, restartGame, showAnalytics, setShowAnalytics } = useUserContext();
   const router = useRouter();
 
   const {
@@ -46,12 +47,25 @@ export default function Home() {
   });
 
   const onSubmit: SubmitHandler<NameSchemaType> = async (data) => {
+    sendAnalyticsEvent(showAnalytics, "login button clicked");
     try {
-      toast.success('Event Logged: Log in Successful')
-      setUserName(data.name);
+      dispatch({ type: "SET_USER_NAME", payload: data.name });
       router.push("./game");
+      restartGame();
+      sendAnalyticsEvent(showAnalytics, "Username set & Game Started");
     } catch (err: any) {
       toast.error("Something went wrong. Please try again later.");
+    }
+  };
+
+  const handleAnalyticsToggle = () => {
+    const newAnalyticsState = !showAnalytics;
+    setShowAnalytics(newAnalyticsState);
+
+    if (newAnalyticsState) {
+      toast.success("Event Logs: ON");
+    } else {
+      toast.error("Event Logs: OFF");
     }
   };
 
@@ -91,18 +105,22 @@ export default function Home() {
               <span>Please enter your name below & press start button</span>
             </section>
             <section className="flex flex-col items-center md:flex-row md:justify-center mb-4">
-              <Input 
-                className="w-full md:w-1/2" 
-                placeholder="Enter your name" 
+              <Input
+                className="w-full md:w-1/2"
+                placeholder="Enter your name"
                 {...register("name")}
                 onKeyDown={() => clearErrors()}
               />
-              <Button 
-               className="mt-4 md:mt-0 md:ml-4"
-               type="submit" 
-               >
+              <Button className="mt-4 md:mt-0 md:ml-4" type="submit">
                 Start
               </Button>
+            </section>
+            <section className="flex items-center justify-center pt-5">
+              <Checkbox 
+                checked={showAnalytics}
+                onCheckedChange={handleAnalyticsToggle} 
+              />
+              <span className="text-sm ml-3">Show event analytics</span>
             </section>
             <section className="flex h-4 md:w-full md:pl-2">
               {errors.name && (
@@ -117,5 +135,3 @@ export default function Home() {
     </main>
   );
 }
-
-
